@@ -283,7 +283,7 @@ Whenever I learn a new language, I feel much more comfortable when I know there'
 
 Don't really know why though.
 
-Anyways, here you go, the syntax is the same as that of the go standard library [fmt.Sprintf][https://golang.org/pkg/fmt/] function:
+Anyways, here you go, the syntax is the same as that of the go standard library [fmt.Sprintf](https://golang.org/pkg/fmt/) function:
 ```
 > cat test.json | jql '("countries" ((keys) (sprintf "%s population: %.0f" ("name") ("population"))))'
 [
@@ -339,7 +339,7 @@ false
 > cat test.json | jql '(gt 5 4)'
 true
 ```
-In case you're wondering, _eq_ does a [reflect.DeepEqual][https://golang.org/pkg/reflect/#DeepEqual] on both arguments.
+In case you're wondering, _eq_ does a [reflect.DeepEqual](https://golang.org/pkg/reflect/#DeepEqual) on both arguments.
 
 You've also got _and_, _or_, _not_, to cover your back when tackling those primal and primitive (some would say *fundamental*) problems you may encounter:
 ```
