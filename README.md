@@ -375,7 +375,7 @@ This brings us to the topic of truthiness. What does _and_ consider to be "true"
 
 #### ifte
 
-ifte sounds kinda fluffy. But it stands for If Then Else.
+ifte sounds kinda fluffy, but it stands for If Then Else.
 ```
 > cat test.json | jql '(ifte true "true" "false")'
 "true"
@@ -390,7 +390,7 @@ l> cat test.json | jql '(ifte true "true" (error ":("))'
 Fluffy and lazy. Like a cat. Who doesn't like cats? Who doesn't like ifte? 🐈
 
 #### filter 🍰
-Sometimes you want just part of the cake, the part with no <insert disliked fruit here>.
+Sometimes you want just part of the cake, the part with no \<insert disliked fruit here\>.
 
 I've got no data set on cakes though, so let's get back to our beloved countries:
 ```
