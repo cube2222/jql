@@ -210,7 +210,7 @@ You can use the _array_ function in value position too obviously. If you want a 
 
 Here you can see that _array_ passes the whole context given to it to each of its arguments. (Remidner: We're using "name" and "population" as elem shortcuts here.)
 
-Most functions work like this. elem is the "context-cutdowner".
+Most functions work like this. Only elem is the "context-cutdowner" so to say.
 
 
 TODO: Benchmarks
