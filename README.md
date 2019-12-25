@@ -119,7 +119,7 @@ It returns an array of all the keys of the given collection. Fields and Indices 
 ---
 ### Attention
 
-Now we have to understand a very important mechanism, underlying jql. All functions operate in the context of the JSON we're operating on.
+Now we have to understand a very important mechanism underlying jql. All functions operate in the context of the JSON we're operating on.
 
 Some functions, like elem, will cut down the context for expressions it evaluates. The first argument - which should evaluate to the positions we need - gets evaluated in the context of the entire array, that's why _keys_ returns all the indices. The second one on the other hand, operates in the context of a single element.
 
@@ -209,6 +209,8 @@ You can use the _array_ function in value position too obviously. If you want a 
 ```
 
 Here you can see that _array_ passes the whole context given to it to each of its arguments. (Remidner: We're using "name" and "population" as elem shortcuts here.)
+
+Most functions work like this. elem is the "context-cutdowner".
 
 
 TODO: Benchmarks
