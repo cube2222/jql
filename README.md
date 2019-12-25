@@ -105,7 +105,8 @@ We can also pass an array of positions to elem, to get more than one country:
 elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple, please refer to the documentation of elem).
 
 ---
-A little showcase:
+### Little showcase
+
 ```
 > cat test.json | jql '("countries" ((array (array 0 (array 0 (array 0 (array 0 2)))) 1 (object "key1" 1 "key2" (array 0 (object "key1" 1 "key2" (array 0 2))))) ("population")))'
 [
@@ -155,6 +156,8 @@ cat test.json | jql '(elem "countries" (elem (keys) (elem "name")))'
 It returns an array of all the keys of the given collection. Fields and Indices for Objects and Arrays respectively.
 
 ---
+### Attention
+
 Now we have to understand a very important mechanism, underlying jql. All functions operate in the context of the JSON we're operating on.
 
 Some functions, like elem, will cut down the context for expressions it evaluates. The first argument - which should evaluate to the positions we need - gets evaluated in the context of the entire array, that's why _keys_ returns all the indices. The second one on the other hand, operates in the context of a single element.
