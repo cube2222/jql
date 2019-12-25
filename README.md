@@ -369,9 +369,9 @@ false
 
 This brings us to the topic of truthiness. What does _and_ consider to be "true"? Well, it's quite simple actually.
 
-null **is not** truthy.
-false **is not** truthy.
-anything else **is** truthy.
+* null **is not** truthy.
+* false **is not** truthy.
+* anything else **is** truthy.
 
 #### ifte
 
