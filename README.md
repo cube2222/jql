@@ -3,9 +3,9 @@ Hey there!
 
 You're probably here cause you're fed up with other json query processors being too complicated to use for anything surpassing simple single field selection.
 
-Well, at least that's what led me here. And that's why I've written jql, a json query processor with an even more cryptic - lispy - syntax (Maybe not that cryptic after all? I quite like it :) )
+Well, at least that's what led me here. And that's why I've written **jql**, a json query processor with an even more cryptic - lispy - syntax (Maybe not that cryptic after all? I quite like it :) )
 
-jql aims to be friendly, helpful, pat you on the back when you're faced with a monstrosity of a JSON blob. Help you mold it into something useful, step by step.
+**jql** aims to be friendly, helpful, pat you on the back when you're faced with a monstrosity of a JSON blob. Help you mold it into something useful, step by step.
 
 Ok, let's check it out now, but first things first, you have to install it:
 ```
@@ -134,7 +134,7 @@ To illustrate, here's _keys_ used on an object:
 ---
 ### Attention
 
-Now we have to understand a very important mechanism underlying jql. All functions operate in the context of the JSON we're operating on.
+Now we have to understand a very important mechanism underlying **jql**. All functions operate in the context of the JSON we're operating on.
 
 Some functions, like elem, will cut down the context for expressions it evaluates. The first argument - which should evaluate to the positions we need - gets evaluated in the context of the entire array, that's why _keys_ returns all the indices. The second one on the other hand, operates in the context of a single element.
 
