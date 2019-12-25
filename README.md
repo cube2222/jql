@@ -410,7 +410,7 @@ I've got no data set on cakes though, so let's get back to our beloved countries
 ]
 ```
 
-Also, because _null_ is not truthy, and _elem_ returns null if it encounters missing fields or indices, you can use _filter_ to get rid of wrong-schema data:
+Also, because _null_ is not truthy, and _elem_ returns _false_ if it encounters missing fields or indices, you can use _filter_ to get rid of wrong-schema data:
 ```
 > cat test.json | jql '("countries" (filter ("eu_since")))'
 [
