@@ -67,7 +67,9 @@ To start with, let's get the countries array only.
 
 Whoa, whoa, whoa! What's up with the parentheses?!
 
-Remember what I said before? Lispy syntax. In short, whenever you see (add 1 2), it's basically the same as add(1, 2). I like that syntax for big hierarchical expressions, if you really really _really_ don't like it, then you can probably stop right here, though you'll be losing out! I've warned you.
+Remember what I said before? Lispy syntax. In short, whenever you see (add 1 2), it's basically the same as add(1, 2). I like that syntax for big hierarchical expressions, if you really really _really_ don't like it, then you can probably stop right here, though you'll be losing out!
+
+I've warned you.
 
 What if we wanted only the first country from that list?
 ```
@@ -101,6 +103,43 @@ We can also pass an array of positions to elem, to get more than one country:
 ```
 
 elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple, please refer to the documentation of elem).
+
+---
+A little showcase:
+```
+> cat test.json | jql '("countries" ((array (array 0 (array 0 (array 0 (array 0 2)))) 1 (object "key1" 1 "key2" (array 0 (object "key1" 1 "key2" (array 0 2))))) ("population")))'
+[
+  [
+    38000000,
+    [
+      38000000,
+      [
+        38000000,
+        [
+          38000000,
+          83000000
+        ]
+      ]
+    ]
+  ],
+  327000000,
+  {
+    "key1": 327000000,
+    "key2": [
+      38000000,
+      {
+        "key1": 327000000,
+        "key2": [
+          38000000,
+          83000000
+        ]
+      }
+    ]
+  }
+]
+```
+Don't do this.
+---
 
 What if we want to get all the country names? A new friend - keys - can help us here.
 ```

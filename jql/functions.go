@@ -56,137 +56,77 @@ func NewElement(ts ...Expression) (Expression, error) {
 	}
 }
 
+func GetElement(positions interface{}, argument interface{}, leafExpression Expression) (interface{}, error) {
+	switch positionTyped := positions.(type) {
+	case []interface{}:
+		outArray := make([]interface{}, len(positionTyped))
+		for i := range positionTyped {
+			var err error
+			outArray[i], err = GetElement(positionTyped[i], argument, leafExpression)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get element using position at array index %d: %w", i, err)
+			}
+		}
+
+		return outArray, nil
+
+	case map[string]interface{}:
+		outObject := make(map[string]interface{}, len(positionTyped))
+		for k := range positionTyped {
+			var err error
+			outObject[k], err = GetElement(positionTyped[k], argument, leafExpression)
+			if err != nil {
+				return nil, fmt.Errorf("couldn't get element using position at object field %s: %w", k, err)
+			}
+		}
+
+		return outObject, nil
+
+	case int:
+		arr, ok := argument.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can't use integer position with argument %v of type %s, should be array", argument, reflect.TypeOf(argument))
+		}
+
+		if len(arr) <= positionTyped {
+			return nil, nil
+		}
+
+		out, err := leafExpression.Get(arr[positionTyped])
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get transformed value for index %d with value %v: %w", positionTyped, arr[positionTyped], err)
+		}
+		return out, nil
+
+	case string:
+		obj, ok := argument.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("can't use string position with argument %v of type %s, should be object", argument, reflect.TypeOf(argument))
+		}
+
+		valueExpressionArgument, ok := obj[positionTyped]
+		if !ok {
+			return nil, nil
+		}
+
+		out, err := leafExpression.Get(valueExpressionArgument)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't get transformed value for field %s with value %v: %w", positionTyped, valueExpressionArgument, err)
+		}
+		return out, nil
+
+	default:
+		return nil, fmt.Errorf("invalid positions for array: %v, should be array of integers or integer", positions)
+	}
+}
+
 func (t Element) Get(arg interface{}) (interface{}, error) {
 	positions, err := t.Positions.Get(arg)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get positions to get: %w", err)
 	}
 
-	switch typed := arg.(type) {
-	case []interface{}:
-		switch indices := positions.(type) {
-		case []interface{}:
-			outArray := make([]interface{}, len(indices))
-			for i := range indices {
-				index, ok := indices[i].(int)
-				if !ok {
-					return nil, fmt.Errorf("position in array should be integer, is %v of type %v", indices[i], reflect.TypeOf(indices[i]))
-				}
-
-				if len(typed) <= index {
-					return nil, fmt.Errorf("index %d out of bounds in array of length %d", indices[i], len(typed))
-				}
-				value := typed[index]
-
-				outArray[i], err = t.ValueExpression.Get(value)
-				if err != nil {
-					return nil, fmt.Errorf("couldn't get transformed value for index %s with value %v: %w", indices[i], value, err)
-				}
-			}
-
-			return outArray, nil
-
-		case map[string]interface{}:
-			outObject := make(map[string]interface{}, len(indices))
-			for k, i := range indices {
-				index, ok := i.(int)
-				if !ok {
-					return nil, fmt.Errorf("position in array should be integer, is %v of type %v", i, reflect.TypeOf(i))
-				}
-
-				if len(typed) <= index {
-					return nil, nil
-				}
-				value := typed[index]
-
-				outObject[k], err = t.ValueExpression.Get(value)
-				if err != nil {
-					return nil, fmt.Errorf("couldn't get transformed value for index %s with value %v: %w", index, value, err)
-				}
-			}
-
-			return outObject, nil
-
-		case int:
-			if len(typed) <= indices {
-				return nil, nil
-			}
-
-			out, err := t.ValueExpression.Get(typed[indices])
-			if err != nil {
-				return nil, fmt.Errorf("couldn't get transformed value for index %s with value %v: %w", indices, typed[indices], err)
-			}
-			return out, nil
-
-		default:
-			return nil, fmt.Errorf("invalid positions for array: %v, should be array of integers or integer", positions)
-		}
-
-	case map[string]interface{}:
-		switch fields := positions.(type) {
-		case []interface{}:
-			outArray := make([]interface{}, 0, len(fields))
-			for i := range fields {
-				field, ok := fields[i].(string)
-				if !ok {
-					return nil, fmt.Errorf("position in object should be string, is %v of type %v", fields[i], reflect.TypeOf(fields[i]))
-				}
-
-				value, ok := typed[field]
-				if !ok {
-					return nil, nil
-				}
-
-				expressionValue, err := t.ValueExpression.Get(value)
-				if err != nil {
-					return nil, fmt.Errorf("couldn't get transformed value for field %s with value %v: %w", fields[i], value, err)
-				}
-				outArray = append(outArray, expressionValue)
-			}
-
-			return outArray, nil
-
-		case map[string]interface{}:
-			outObject := make(map[string]interface{}, len(fields))
-			for k := range fields {
-				field, ok := fields[k].(string)
-				if !ok {
-					return nil, fmt.Errorf("position in object should be string, is %v of type %v", fields[k], reflect.TypeOf(fields[k]))
-				}
-
-				value, ok := typed[field]
-				if !ok {
-					return nil, nil
-				}
-
-				expressionValue, err := t.ValueExpression.Get(value)
-				if err != nil {
-					return nil, fmt.Errorf("couldn't get transformed value for field %s with value %v: %w", field, value, err)
-				}
-				outObject[k] = expressionValue
-			}
-
-			return outObject, nil
-
-		case string:
-			valueExpressionArgument, ok := typed[fields]
-			if !ok {
-				return nil, nil
-			}
-
-			out, err := t.ValueExpression.Get(valueExpressionArgument)
-			if err != nil {
-				return nil, fmt.Errorf("couldn't get transformed value for field %s with value %v: %w", fields, typed[fields], err)
-			}
-			return out, nil
-
-		default:
-			return nil, fmt.Errorf("invalid fields for object: %v, should be array of strings or string", positions)
-		}
-
-	default:
-		return nil, fmt.Errorf("can only use element on array or object, used on: %s", reflect.TypeOf(arg))
-	}
+	return GetElement(positions, arg, t.ValueExpression)
 }
 
 type Keys struct {
@@ -644,3 +584,5 @@ func (t Range) Get(arg interface{}) (interface{}, error) {
 
 	return out, nil
 }
+
+// TODO: ifte
