@@ -83,6 +83,8 @@ What if we wanted only the first country from that list?
 ```
 Let's break down what happened here. First we took the "countries" field. elem takes an additional argument, which says "how to transform the element", it's also an expression. Here we say we want to take the first element of the countries array. The default function is _id_, which stands for identity.
 
+#### array
+
 We can also pass an array of positions to elem, to get more than one country:
 ```
 > cat test.json | jql '(elem "countries" (elem (array 0 2)))'
@@ -103,6 +105,8 @@ We can also pass an array of positions to elem, to get more than one country:
 ```
 
 elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple, please refer to the documentation of elem).
+
+#### keys
 
 What if we want to get all the country names? A new friend - keys - can help us here.
 ```
@@ -180,6 +184,8 @@ Don't do this.
 
 ---
 
+#### range
+
 We can also select a range of elements, using the... you guessed it - _range_ function.
 ```
 > cat test.json | jql '("countries" ((range 1 3) ("name")))'
@@ -212,5 +218,25 @@ Here you can see that _array_ passes the whole context given to it to each of it
 
 Most functions work like this. Only elem is the "context-cutdowner" so to say.
 
+#### object
+
+You can also use _object_ to create objects, with arguments alternating key and values.
+```
+> cat test.json | jql '(object
+                            "names" ("countries" ((keys) ("name")))
+                            "populations" ("countries" ((array 0 0 1) ("population"))))'
+{
+  "names": [
+    "Poland",
+    "United States",
+    "Germany"
+  ],
+  "populations": [
+    38000000,
+    38000000,
+    327000000
+  ]
+}
+```
 
 TODO: Benchmarks
