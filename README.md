@@ -104,45 +104,6 @@ We can also pass an array of positions to elem, to get more than one country:
 
 elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple, please refer to the documentation of elem).
 
----
-### Little showcase
-
-```
-> cat test.json | jql '("countries" ((array (array 0 (array 0 (array 0 (array 0 2)))) 1 (object "key1" 1 "key2" (array 0 (object "key1" 1 "key2" (array 0 2))))) ("population")))'
-[
-  [
-    38000000,
-    [
-      38000000,
-      [
-        38000000,
-        [
-          38000000,
-          83000000
-        ]
-      ]
-    ]
-  ],
-  327000000,
-  {
-    "key1": 327000000,
-    "key2": [
-      38000000,
-      {
-        "key1": 327000000,
-        "key2": [
-          38000000,
-          83000000
-        ]
-      }
-    ]
-  }
-]
-```
-Don't do this.
-
----
-
 What if we want to get all the country names? A new friend - keys - can help us here.
 ```
 cat test.json | jql '(elem "countries" (elem (keys) (elem "name")))'
@@ -179,6 +140,45 @@ This way we can rewrite the previous query to be much shorter, and better match 
   "Germany"
 ]
 ```
+
+---
+### Little showcase
+Remember when I said you can use integers, strings, arrays and objects as positions?
+```
+> cat test.json | jql '("countries" ((array (array 0 (array 0 (array 0 (array 0 2)))) 1 (object "key1" 1 "key2" (array 0 (object "key1" 1 "key2" (array 0 2))))) ("population")))'
+[
+  [
+    38000000,
+    [
+      38000000,
+      [
+        38000000,
+        [
+          38000000,
+          83000000
+        ]
+      ]
+    ]
+  ],
+  327000000,
+  {
+    "key1": 327000000,
+    "key2": [
+      38000000,
+      {
+        "key1": 327000000,
+        "key2": [
+          38000000,
+          83000000
+        ]
+      }
+    ]
+  }
+]
+```
+Don't do this.
+
+---
 
 We can also select a range of elements, using the... you guessed it - _range_ function.
 ```
