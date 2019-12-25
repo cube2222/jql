@@ -139,6 +139,7 @@ A little showcase:
 ]
 ```
 Don't do this.
+
 ---
 
 What if we want to get all the country names? A new friend - keys - can help us here.
@@ -161,6 +162,7 @@ Some functions, like elem, will cut down the context for expressions it evaluate
 In theory we're really just creating and composing a big function - pipeline, so to say - which gets applied to our JSON blob.
 
 This may sound complicated, but I find it becomes intuitive quite quickly.
+
 ---
 
 You can see that elem is the most used function, and in fact that is what you'll usually be using when munging data, so there's a shortcut. If you put a value in function name position, it implicitly converts it to an elem.
