@@ -27,7 +27,7 @@ func main() {
 	output.SetIndent("", "  ")
 
 	for {
-		var inObject map[string]interface{}
+		var inObject interface{}
 		err := input.Decode(&inObject)
 		if err != nil {
 			if err == io.EOF {

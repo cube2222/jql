@@ -4,6 +4,7 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -32,6 +33,22 @@ func (t *Tokenizer) Lex(lval *yySymType) int {
 	ch := t.queryText[t.index]
 
 	if ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') {
+		if strings.HasPrefix(t.queryText[t.index:], "true") {
+			lval.bool = true
+			t.index += len("true")
+			return BOOLEAN
+		}
+		if strings.HasPrefix(t.queryText[t.index:], "false") {
+			lval.bool = false
+			t.index += len("false")
+			return BOOLEAN
+		}
+		if strings.HasPrefix(t.queryText[t.index:], "null") {
+			lval.null = nil
+			t.index += len("null")
+			return NULL
+		}
+
 		indices := identifierRegexp.FindStringIndex(t.queryText[t.index:])
 
 		lval.bytes = []byte(t.queryText[t.index : t.index+indices[1]])

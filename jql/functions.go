@@ -3,6 +3,7 @@ package jql
 import (
 	"fmt"
 	"reflect"
+	"runtime/debug"
 	"strings"
 )
 
@@ -20,6 +21,11 @@ var Functions = map[string]func(ts ...Expression) (Expression, error){
 	"lt":      NewLessThan,
 	"gt":      NewGreaterThan,
 	"range":   NewRange,
+	"and":     NewAnd,
+	"or":      NewOr,
+	"not":     NewNot,
+	"ifte":    NewIfTE,
+	"error":   NewError,
 }
 
 type Constant struct {
@@ -430,6 +436,17 @@ func (t Equal) Get(arg interface{}) (interface{}, error) {
 	return reflect.DeepEqual(leftValue, rightValue), nil
 }
 
+func Floatify(arg interface{}) (float64, error) {
+	switch typed := arg.(type) {
+	case float64:
+		return typed, nil
+	case int:
+		return float64(typed), nil
+	default:
+		return 0, fmt.Errorf("can't floatify value %v of type %s", arg, reflect.TypeOf(arg))
+	}
+}
+
 type LessThan struct {
 	Left  Expression
 	Right Expression
@@ -464,19 +481,16 @@ func (t LessThan) Get(arg interface{}) (interface{}, error) {
 		}
 		return left < right, nil
 
-	case int:
-		right, ok := rightValue.(int)
-		if !ok {
-			return false, nil
+	case int, float64:
+		leftFloat, err := Floatify(leftValue)
+		if err != nil {
+			return false, fmt.Errorf("can't floatify gt function left expression: %w", err)
 		}
-		return left < right, nil
-
-	case float64:
-		right, ok := rightValue.(float64)
-		if !ok {
-			return false, nil
+		rightFloat, err := Floatify(rightValue)
+		if err != nil {
+			return false, fmt.Errorf("can't floatify gt function right expression: %w", err)
 		}
-		return left < right, nil
+		return leftFloat < rightFloat, nil
 
 	default:
 		return false, nil
@@ -517,19 +531,16 @@ func (t GreaterThan) Get(arg interface{}) (interface{}, error) {
 		}
 		return left > right, nil
 
-	case int:
-		right, ok := rightValue.(int)
-		if !ok {
-			return false, nil
+	case int, float64:
+		leftFloat, err := Floatify(leftValue)
+		if err != nil {
+			return false, fmt.Errorf("can't floatify gt function left expression: %w", err)
 		}
-		return left > right, nil
-
-	case float64:
-		right, ok := rightValue.(float64)
-		if !ok {
-			return false, nil
+		rightFloat, err := Floatify(rightValue)
+		if err != nil {
+			return false, fmt.Errorf("can't floatify gt function right expression: %w", err)
 		}
-		return left > right, nil
+		return leftFloat > rightFloat, nil
 
 	default:
 		return false, nil
@@ -585,4 +596,124 @@ func (t Range) Get(arg interface{}) (interface{}, error) {
 	return out, nil
 }
 
-// TODO: ifte
+type And struct {
+	Values []Expression
+}
+
+func NewAnd(ts ...Expression) (Expression, error) {
+	return And{Values: ts}, nil
+}
+
+func (t And) Get(arg interface{}) (interface{}, error) {
+	out := true
+	for i := range t.Values {
+		v, err := t.Values[i].Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate and argument with index %d: %w", i, err)
+		}
+		out = out && IsTruthy(v)
+	}
+
+	return out, nil
+}
+
+type Or struct {
+	Values []Expression
+}
+
+func NewOr(ts ...Expression) (Expression, error) {
+	return Or{Values: ts}, nil
+}
+
+func (t Or) Get(arg interface{}) (interface{}, error) {
+	out := true
+	for i := range t.Values {
+		v, err := t.Values[i].Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate or argument with index %d: %w", i, err)
+		}
+		out = out || IsTruthy(v)
+	}
+
+	return out, nil
+}
+
+type Not struct {
+	Value Expression
+}
+
+func NewNot(ts ...Expression) (Expression, error) {
+	if len(ts) != 1 {
+		return nil, fmt.Errorf("invalid argument count to not function: %v", len(ts))
+	}
+	return Not{Value: ts[0]}, nil
+}
+
+func (t Not) Get(arg interface{}) (interface{}, error) {
+	v, err := t.Value.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate not argument with index: %w", err)
+	}
+
+	return !IsTruthy(v), nil
+}
+
+type IfTE struct {
+	If   Expression
+	Then Expression
+	Else Expression
+}
+
+func NewIfTE(ts ...Expression) (Expression, error) {
+	if len(ts) != 3 {
+		return nil, fmt.Errorf("invalid argument count to ifte function: %v", len(ts))
+	}
+	return IfTE{
+		If:   ts[0],
+		Then: ts[1],
+		Else: ts[2],
+	}, nil
+}
+
+func (t IfTE) Get(arg interface{}) (interface{}, error) {
+	ifExpression, err := t.If.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate ifte function if expression: %w", err)
+	}
+
+	if IsTruthy(ifExpression) {
+		thenExpression, err := t.Then.Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate ifte function then expression: %w", err)
+		}
+		return thenExpression, nil
+	} else {
+		elseExpression, err := t.Else.Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate ifte function else expression: %w", err)
+		}
+		return elseExpression, nil
+	}
+}
+
+type Error struct {
+	Message Expression
+}
+
+func NewError(ts ...Expression) (Expression, error) {
+	if len(ts) != 1 {
+		return nil, fmt.Errorf("invalid argument count to error function: %v", len(ts))
+	}
+	return Error{
+		Message: ts[0],
+	}, nil
+}
+
+func (t Error) Get(arg interface{}) (interface{}, error) {
+	message, err := t.Message.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate error function message expression: %w", err)
+	}
+
+	return nil, fmt.Errorf("Message: %v\n%s", message, debug.Stack())
+}

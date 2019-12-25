@@ -7,6 +7,8 @@ package parser
   int int
   bytes []byte
   string string
+  bool bool
+  null interface{}
   expression   Expression
   sexpression *SExpression
   expressions Expressions
@@ -16,6 +18,8 @@ package parser
 %token <bytes> ID
 %token <string> STRING
 %token <int> INTEGER
+%token <bool> BOOLEAN
+%token <null> NULL
 %token <empty> '(' ')'
 
 %type <expression> expression
@@ -55,6 +59,14 @@ constant:
   {
     $$ = &Constant{Value: $1}
   }
+| BOOLEAN
+	{
+		$$ = &Constant{Value: $1}
+	}
+| NULL
+	{
+		$$ = &Constant{Value: nil}
+	}
 
 sexpr:
   '(' ID args_opt ')'
