@@ -430,7 +430,7 @@ Also, because _null_ is not truthy, and _elem_ returns _false_ if it encounters 
 ```
 
 ### pipe
-Pipe is a fairly useless function because you can just use a bash pipe. But if for some reason you want to save cpu cycles:
+_pipe_ is a fairly useless function because you can just use a bash pipe. But if for some reason you want to save cpu cycles:
 ```
 > cat test.json | jql '(pipe
                            ("countries")
