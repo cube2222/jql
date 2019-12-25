@@ -10,7 +10,9 @@ import __yyfmt__ "fmt"
 //line lang.y:6
 type yySymType struct {
 	yys         int
+	int         int
 	bytes       []byte
+	string      string
 	expression  Expression
 	sexpression *SExpression
 	expressions Expressions
@@ -20,6 +22,7 @@ type yySymType struct {
 
 const ID = 57346
 const STRING = 57347
+const INTEGER = 57348
 
 var yyToknames = [...]string{
 	"$end",
@@ -27,6 +30,7 @@ var yyToknames = [...]string{
 	"$unk",
 	"ID",
 	"STRING",
+	"INTEGER",
 	"'('",
 	"')'",
 }
@@ -45,39 +49,41 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 12
+const yyLast = 19
 
 var yyAct = [...]int{
 
-	2, 5, 6, 7, 11, 1, 9, 8, 10, 4,
-	12, 3,
+	12, 2, 8, 5, 6, 7, 10, 16, 9, 5,
+	6, 7, 15, 14, 1, 11, 13, 4, 3,
 }
 var yyPact = [...]int{
 
-	-4, -1000, -1000, -1000, -1000, -1000, -1, -4, -3, -4,
-	-1000, -1000, -1000,
+	4, -1000, -1000, -1000, -1000, -1000, -1000, -2, 4, 4,
+	5, 4, -1000, -1, -1000, -1000, -1000,
 }
 var yyPgo = [...]int{
 
-	0, 0, 11, 9, 7, 6, 5,
+	0, 0, 18, 17, 6, 15, 14,
 }
 var yyR1 = [...]int{
 
-	0, 6, 1, 1, 2, 3, 4, 4, 5, 5,
+	0, 6, 1, 1, 2, 2, 3, 3, 4, 4,
+	5, 5,
 }
 var yyR2 = [...]int{
 
-	0, 1, 1, 1, 1, 4, 0, 1, 1, 2,
+	0, 1, 1, 1, 1, 1, 4, 4, 0, 1,
+	1, 2,
 }
 var yyChk = [...]int{
 
-	-1000, -6, -1, -2, -3, 5, 6, 4, -4, -5,
-	-1, 7, -1,
+	-1000, -6, -1, -2, -3, 5, 6, 7, 4, -1,
+	-4, -5, -1, -4, 8, -1, 8,
 }
 var yyDef = [...]int{
 
-	0, -2, 1, 2, 3, 4, 0, 6, 0, 7,
-	8, 5, 9,
+	0, -2, 1, 2, 3, 4, 5, 0, 8, 8,
+	0, 9, 10, 0, 6, 11, 7,
 }
 var yyTok1 = [...]int{
 
@@ -85,11 +91,11 @@ var yyTok1 = [...]int{
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	6, 7,
+	7, 8,
 }
 var yyTok2 = [...]int{
 
-	2, 3, 4, 5,
+	2, 3, 4, 5, 6,
 }
 var yyTok3 = [...]int{
 	0,
@@ -434,56 +440,68 @@ yydefault:
 
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:30
+//line lang.y:34
 		{
 			yyVAL.query = &Query{Expression: yyDollar[1].expression}
 			setQuery(yylex, yyVAL.query)
 		}
 	case 2:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:37
+//line lang.y:41
 		{
 			yyVAL.expression = yyDollar[1].constant
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:41
+//line lang.y:45
 		{
 			yyVAL.expression = yyDollar[1].sexpression
 		}
 	case 4:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:47
+//line lang.y:51
 		{
-			yyVAL.constant = &Constant{Value: string(yyDollar[1].bytes)}
+			yyVAL.constant = &Constant{Value: yyDollar[1].string}
 		}
 	case 5:
+		yyDollar = yyS[yypt-1 : yypt+1]
+//line lang.y:55
+		{
+			yyVAL.constant = &Constant{Value: yyDollar[1].int}
+		}
+	case 6:
 		yyDollar = yyS[yypt-4 : yypt+1]
-//line lang.y:53
+//line lang.y:61
 		{
 			yyVAL.sexpression = &SExpression{Name: string(yyDollar[2].bytes), Args: yyDollar[3].expressions}
 		}
-	case 6:
+	case 7:
+		yyDollar = yyS[yypt-4 : yypt+1]
+//line lang.y:65
+		{
+			yyVAL.sexpression = &SExpression{Name: "elem", Args: append([]Expression{yyDollar[2].expression}, yyDollar[3].expressions...)}
+		}
+	case 8:
 		yyDollar = yyS[yypt-0 : yypt+1]
-//line lang.y:58
+//line lang.y:70
 		{
 			yyVAL.expressions = nil
 		}
-	case 7:
+	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:62
+//line lang.y:74
 		{
 			yyVAL.expressions = yyDollar[1].expressions
 		}
-	case 8:
+	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line lang.y:68
+//line lang.y:80
 		{
 			yyVAL.expressions = []Expression{yyDollar[1].expression}
 		}
-	case 9:
+	case 11:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line lang.y:72
+//line lang.y:84
 		{
 			yyVAL.expressions = append(yyVAL.expressions, yyDollar[2].expression)
 		}

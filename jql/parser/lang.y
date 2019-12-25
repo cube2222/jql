@@ -4,14 +4,18 @@ package parser
 %}
 
 %union {
+	int int
 	bytes []byte
+	string string
 	expression 	Expression
 	sexpression *SExpression
 	expressions Expressions
 	query *Query
 	constant *Constant
 }
-%token <bytes> ID STRING INTEGRAL
+%token <bytes> ID
+%token <string> STRING
+%token <int> INTEGER
 %token <empty> '(' ')'
 
 %type <expression> expression
@@ -45,7 +49,11 @@ expression:
 constant:
 	STRING
 	{
-		$$ = &Constant{Value: string($1)}
+		$$ = &Constant{Value: $1}
+	}
+| INTEGER
+	{
+		$$ = &Constant{Value: $1}
 	}
 
 sexpr:
@@ -53,6 +61,10 @@ sexpr:
 	{
 		$$ = &SExpression{Name: string($2), Args: $3}
 	}
+| '(' expression args_opt ')'
+  	{
+  		$$ = &SExpression{Name: "elem", Args: append([]Expression{$2}, $3...)}
+  	}
 
 args_opt:
 	{
