@@ -3,15 +3,23 @@ package jql
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var Functions = map[string]func(ts ...Expression) (Expression, error){
-	"elem":   NewElement,
-	"keys":   NewKeys,
-	"id":     NewIdentity,
-	"array":  NewArray,
-	"object": NewObject,
-	"pipe":   NewPipe,
+	"elem":    NewElement,
+	"keys":    NewKeys,
+	"id":      NewIdentity,
+	"array":   NewArray,
+	"object":  NewObject,
+	"pipe":    NewPipe,
+	"sprintf": NewSprintf,
+	"join":    NewJoin,
+	"filter":  NewFilter,
+	"eq":      NewEqual,
+	"lt":      NewLessThan,
+	"gt":      NewGreaterThan,
+	"range":   NewRange,
 }
 
 type Constant struct {
@@ -87,7 +95,7 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 				}
 
 				if len(typed) <= index {
-					return nil, fmt.Errorf("index %d out of bounds in array of length %d", i, len(typed))
+					return nil, nil
 				}
 				value := typed[index]
 
@@ -100,6 +108,10 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 			return outObject, nil
 
 		case int:
+			if len(typed) <= indices {
+				return nil, nil
+			}
+
 			out, err := t.ValueExpression.Get(typed[indices])
 			if err != nil {
 				return nil, fmt.Errorf("couldn't get transformed value for index %s with value %v: %w", indices, typed[indices], err)
@@ -122,7 +134,7 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 
 				value, ok := typed[field]
 				if !ok {
-					return nil, fmt.Errorf("no such field in object: %s", field)
+					return nil, nil
 				}
 
 				expressionValue, err := t.ValueExpression.Get(value)
@@ -144,7 +156,7 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 
 				value, ok := typed[field]
 				if !ok {
-					return nil, fmt.Errorf("no such field in object: %s", field)
+					return nil, nil
 				}
 
 				expressionValue, err := t.ValueExpression.Get(value)
@@ -157,7 +169,12 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 			return outObject, nil
 
 		case string:
-			out, err := t.ValueExpression.Get(typed[fields])
+			valueExpressionArgument, ok := typed[fields]
+			if !ok {
+				return nil, nil
+			}
+
+			out, err := t.ValueExpression.Get(valueExpressionArgument)
 			if err != nil {
 				return nil, fmt.Errorf("couldn't get transformed value for field %s with value %v: %w", fields, typed[fields], err)
 			}
@@ -306,4 +323,324 @@ func (t Pipe) Get(arg interface{}) (interface{}, error) {
 		}
 	}
 	return object, nil
+}
+
+type Sprintf struct {
+	Format      Expression
+	Expressions []Expression
+}
+
+func NewSprintf(ts ...Expression) (Expression, error) {
+	if len(ts) == 0 {
+		return nil, fmt.Errorf("sprintf function needs at least one argument")
+	}
+	return Sprintf{Format: ts[0], Expressions: ts[1:]}, nil
+}
+
+func (t Sprintf) Get(arg interface{}) (interface{}, error) {
+	formatValue, err := t.Format.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate sprintf format argument: %w", err)
+	}
+	format, ok := formatValue.(string)
+	if !ok {
+		return nil, fmt.Errorf("sprintf format argument should be string, is %v of type %s", formatValue, reflect.TypeOf(formatValue))
+	}
+
+	values := make([]interface{}, len(t.Expressions))
+	for i := range t.Expressions {
+		var err error
+		values[i], err = t.Expressions[i].Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate sprintf argument with index %d: %w", i, err)
+		}
+	}
+	return fmt.Sprintf(format, values...), nil
+}
+
+type Join struct {
+	Strings   Expression
+	Separator Expression
+}
+
+func NewJoin(ts ...Expression) (Expression, error) {
+	switch len(ts) {
+	case 1:
+		return Join{
+			Strings:   ts[0],
+			Separator: &Constant{value: ""},
+		}, nil
+	case 2:
+		return Join{
+			Strings:   ts[0],
+			Separator: ts[1],
+		}, nil
+	default:
+		return nil, fmt.Errorf("invalid argument count to join function: %v", len(ts))
+	}
+}
+
+func (t Join) Get(arg interface{}) (interface{}, error) {
+	separatorValue, err := t.Separator.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate join separator argument: %w", err)
+	}
+	separator, ok := separatorValue.(string)
+	if !ok {
+		return nil, fmt.Errorf("join separator argument should be string, is %v of type %s", separatorValue, reflect.TypeOf(separatorValue))
+	}
+
+	argsValue, err := t.Strings.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate join strings argument: %w", err)
+	}
+	args, ok := argsValue.([]interface{})
+	if !ok {
+		return fmt.Sprint(argsValue), nil
+	}
+
+	stringArgs := make([]string, len(args))
+	for i := range args {
+		stringArgs[i] = fmt.Sprint(args[i])
+	}
+
+	return strings.Join(stringArgs, separator), nil
+}
+
+func IsTruthy(value interface{}) bool {
+	if value == nil {
+		return false
+	}
+	if b, ok := value.(bool); ok && !b {
+		return false
+	}
+	return true
+}
+
+type Filter struct {
+	Predicate  Expression
+	Expression Expression
+}
+
+func NewFilter(ts ...Expression) (Expression, error) {
+	switch len(ts) {
+	case 1:
+		return Filter{
+			Predicate:  ts[0],
+			Expression: &Identity{},
+		}, nil
+	case 2:
+		return Filter{
+			Predicate:  ts[0],
+			Expression: ts[1],
+		}, nil
+	default:
+		return nil, fmt.Errorf("invalid argument count to filter function: %v", len(ts))
+	}
+}
+
+func (t Filter) Get(arg interface{}) (interface{}, error) {
+	args, ok := arg.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("filter expects an array, received %v of type %s", arg, reflect.TypeOf(arg))
+	}
+
+	out := make([]interface{}, 0, len(args))
+
+	for i := range args {
+		predicateValue, err := t.Predicate.Get(args[i])
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate filter predicate for array index %d with expression value %v: %w", i, args[i], err)
+		}
+
+		if IsTruthy(predicateValue) {
+			out = append(out, args[i])
+		}
+	}
+
+	return out, nil
+}
+
+type Equal struct {
+	Left  Expression
+	Right Expression
+}
+
+func NewEqual(ts ...Expression) (Expression, error) {
+	if len(ts) != 2 {
+		return nil, fmt.Errorf("invalid argument count to equal function: %v", len(ts))
+	}
+
+	return &Equal{
+		Left:  ts[0],
+		Right: ts[1],
+	}, nil
+}
+
+func (t Equal) Get(arg interface{}) (interface{}, error) {
+	leftValue, err := t.Left.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate equal function left expression: %w", err)
+	}
+	rightValue, err := t.Right.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate equal function right expression: %w", err)
+	}
+
+	return reflect.DeepEqual(leftValue, rightValue), nil
+}
+
+type LessThan struct {
+	Left  Expression
+	Right Expression
+}
+
+func NewLessThan(ts ...Expression) (Expression, error) {
+	if len(ts) != 2 {
+		return nil, fmt.Errorf("invalid argument count to lt function: %v", len(ts))
+	}
+
+	return &LessThan{
+		Left:  ts[0],
+		Right: ts[1],
+	}, nil
+}
+
+func (t LessThan) Get(arg interface{}) (interface{}, error) {
+	leftValue, err := t.Left.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate lt function left expression: %w", err)
+	}
+	rightValue, err := t.Right.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate lt function right expression: %w", err)
+	}
+
+	switch left := leftValue.(type) {
+	case string:
+		right, ok := rightValue.(string)
+		if !ok {
+			return false, nil
+		}
+		return left < right, nil
+
+	case int:
+		right, ok := rightValue.(int)
+		if !ok {
+			return false, nil
+		}
+		return left < right, nil
+
+	case float64:
+		right, ok := rightValue.(float64)
+		if !ok {
+			return false, nil
+		}
+		return left < right, nil
+
+	default:
+		return false, nil
+	}
+}
+
+type GreaterThan struct {
+	Left  Expression
+	Right Expression
+}
+
+func NewGreaterThan(ts ...Expression) (Expression, error) {
+	if len(ts) != 2 {
+		return nil, fmt.Errorf("invalid argument count to gt function: %v", len(ts))
+	}
+
+	return &GreaterThan{
+		Left:  ts[0],
+		Right: ts[1],
+	}, nil
+}
+
+func (t GreaterThan) Get(arg interface{}) (interface{}, error) {
+	leftValue, err := t.Left.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate gt function left expression: %w", err)
+	}
+	rightValue, err := t.Right.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate gt function right expression: %w", err)
+	}
+
+	switch left := leftValue.(type) {
+	case string:
+		right, ok := rightValue.(string)
+		if !ok {
+			return false, nil
+		}
+		return left > right, nil
+
+	case int:
+		right, ok := rightValue.(int)
+		if !ok {
+			return false, nil
+		}
+		return left > right, nil
+
+	case float64:
+		right, ok := rightValue.(float64)
+		if !ok {
+			return false, nil
+		}
+		return left > right, nil
+
+	default:
+		return false, nil
+	}
+}
+
+type Range struct {
+	Begin Expression
+	End   Expression
+}
+
+func NewRange(ts ...Expression) (Expression, error) {
+	switch len(ts) {
+	case 1:
+		return &Range{
+			Begin: &Constant{value: 0},
+			End:   ts[0],
+		}, nil
+	case 2:
+		return &Range{
+			Begin: ts[0],
+			End:   ts[1],
+		}, nil
+	default:
+		return nil, fmt.Errorf("invalid argument count to range function: %v", len(ts))
+	}
+}
+
+func (t Range) Get(arg interface{}) (interface{}, error) {
+	beginValue, err := t.Begin.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate range function begin expression: %w", err)
+	}
+	begin, ok := beginValue.(int)
+	if !ok {
+		return nil, fmt.Errorf("range expected begin argument of type int, got %v of type %s", beginValue, reflect.TypeOf(beginValue))
+	}
+
+	endValue, err := t.End.Get(arg)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't evaluate range function end expression: %w", err)
+	}
+	end, ok := endValue.(int)
+	if !ok {
+		return nil, fmt.Errorf("range expected end argument of type int, got %v of type %s", endValue, reflect.TypeOf(endValue))
+	}
+
+	out := make([]interface{}, end-begin)
+	for i := range out {
+		out[i] = begin + i
+	}
+
+	return out, nil
 }

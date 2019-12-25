@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"os"
 
@@ -10,23 +11,6 @@ import (
 )
 
 func main() {
-	var object map[string]interface{}
-	err := json.Unmarshal([]byte(`{
-  "cities": [
-    {
-      "name": "Berlin",
-      "population": 8000000
-    },
-    {
-      "name": "Warsaw",
-      "population": 4000000
-    }
-  ]
-}`), &object)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	parsed := parser.Parse(os.Args[1])
 	expr, err := parsed.GetExecutionExpression(parser.ExpressionConstructorContext{
 		Functions: jql.Functions,
@@ -38,15 +22,28 @@ func main() {
 		log.Fatalf("couldn't get execution expression from AST: %v", err)
 	}
 
-	out, err := expr.Get(object)
-	if err != nil {
-		log.Fatalf("error getting expression value for object: %v", err)
-	}
+	input := json.NewDecoder(os.Stdin)
+	output := json.NewEncoder(os.Stdout)
+	output.SetIndent("", "  ")
 
-	e := json.NewEncoder(os.Stdout)
-	e.SetIndent("", "  ")
-	err = e.Encode(&out)
-	if err != nil {
-		log.Fatal(err)
+	for {
+		var inObject map[string]interface{}
+		err := input.Decode(&inObject)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatalf("couldn't decode json: %v", err)
+		}
+
+		outObject, err := expr.Get(inObject)
+		if err != nil {
+			log.Fatalf("error getting expression value for object: %v", err)
+		}
+
+		err = output.Encode(&outObject)
+		if err != nil {
+			log.Fatalf("couldn't encode json: %v", err)
+		}
 	}
 }
