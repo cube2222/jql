@@ -450,4 +450,11 @@ equal to
 ]
 ```
 
+# Summary
+Hope you liked this **incredible** journey!
+
+Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I hope **jql** will become your weapon of choice for dealing with them from now on! ⚔️
+
+Issues, comments, messages, reviews, benchmarks, you name it! - very appreciated.
+
 TODO: Benchmarks
