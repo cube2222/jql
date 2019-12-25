@@ -14,7 +14,7 @@ go get github.com/cube2222/jql
 
 Ok. Done.
 
-Let's check out a few _simple_ examples. (remember? That's explicitly *not* why we're here. But it aids understanding of the more complex examples, so stay with me just a little bit longer!)
+Let's check out a few _simple_ examples. (remember? That's explicitly **not** why we're here. But it aids understanding of the more complex examples, so stay with me just a little bit longer!)
 
 We'll be working with this piece of json:
 ```json
@@ -250,7 +250,7 @@ You can also use _object_ to create objects, with arguments alternating keys and
 }
 ```
 
-Now we're done with the *core* functionality of jql. The stuff so far will probably suffice for most use cases and even very complex data structures.
+Now we're done with the **core** functionality of jql. The stuff so far will probably suffice for most use cases and even very complex data structures.
 
 However, here come more functions:
 
@@ -341,7 +341,7 @@ true
 ```
 In case you're wondering, _eq_ does a [reflect.DeepEqual](https://golang.org/pkg/reflect/#DeepEqual) on both arguments.
 
-You've also got _and_, _or_, _not_, to cover your back when tackling those primal and primitive (some would say *fundamental*) problems you may encounter:
+You've also got _and_, _or_, _not_, to cover your back when tackling those primal and primitive (some would say **fundamental**) problems you may encounter:
 ```
 > cat test.json | jql '(and true true true)'
 true
@@ -369,9 +369,9 @@ false
 
 This brings us to the topic of truthiness. What does _and_ consider to be "true"? Well, it's quite simple actually.
 
-null *is not* truthy.
-false *is not* truthy.
-anything else *is* truthy.
+null **is not** truthy.
+false **is not** truthy.
+anything else **is** truthy.
 
 #### ifte
 
