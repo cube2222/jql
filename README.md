@@ -104,7 +104,7 @@ We can also pass an array of positions to elem, to get more than one country:
 ]
 ```
 
-elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple, please refer to the documentation of elem).
+elem can work with single strings, single integers, arrays of those, and objects with them as values (but we won't cover those now to keep things simple).
 
 #### keys
 
