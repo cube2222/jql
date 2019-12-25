@@ -375,7 +375,7 @@ This brings us to the topic of truthiness. What does _and_ consider to be "true"
 
 #### ifte
 
-ifte sounds kinda fluffy, but it stands for If Then Else.
+ifte sounds kinda fluffy, but unfortunately it only stands for If Then Else.
 ```
 > cat test.json | jql '(ifte true "true" "false")'
 "true"
