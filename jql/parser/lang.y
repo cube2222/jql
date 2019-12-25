@@ -4,14 +4,14 @@ package parser
 %}
 
 %union {
-	int int
-	bytes []byte
-	string string
-	expression 	Expression
-	sexpression *SExpression
-	expressions Expressions
-	query *Query
-	constant *Constant
+  int int
+  bytes []byte
+  string string
+  expression   Expression
+  sexpression *SExpression
+  expressions Expressions
+  query *Query
+  constant *Constant
 }
 %token <bytes> ID
 %token <string> STRING
@@ -30,57 +30,57 @@ package parser
 %%
 
 query:
-	expression
-	{
-		$$ = &Query{Expression: $1}
-		setQuery(yylex, $$)
-	}
+  expression
+  {
+    $$ = &Query{Expression: $1}
+    setQuery(yylex, $$)
+  }
 
 expression:
-	constant
-	{
-		$$ = $1
-	}
+  constant
+  {
+    $$ = $1
+  }
 | sexpr
-	{
-		$$ = $1
-	}
+  {
+    $$ = $1
+  }
 
 constant:
-	STRING
-	{
-		$$ = &Constant{Value: $1}
-	}
+  STRING
+  {
+    $$ = &Constant{Value: $1}
+  }
 | INTEGER
-	{
-		$$ = &Constant{Value: $1}
-	}
+  {
+    $$ = &Constant{Value: $1}
+  }
 
 sexpr:
-	'(' ID args_opt ')'
-	{
-		$$ = &SExpression{Name: string($2), Args: $3}
-	}
+  '(' ID args_opt ')'
+  {
+    $$ = &SExpression{Name: string($2), Args: $3}
+  }
 | '(' expression args_opt ')'
-  	{
-  		$$ = &SExpression{Name: "elem", Args: append([]Expression{$2}, $3...)}
-  	}
+    {
+      $$ = &SExpression{Name: "elem", Args: append([]Expression{$2}, $3...)}
+    }
 
 args_opt:
-	{
-		$$ = nil
-	}
+  {
+    $$ = nil
+  }
 | args
-	{
-		$$ = $1
-	}
+  {
+    $$ = $1
+  }
 
 args:
-	expression
-	{
-		$$ = []Expression{$1}
-	}
+  expression
+  {
+    $$ = []Expression{$1}
+  }
 | args expression
-	{
-		$$ = append($$, $2)
-	}
+  {
+    $$ = append($$, $2)
+  }

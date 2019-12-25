@@ -11,6 +11,7 @@ var Functions = map[string]func(ts ...Expression) (Expression, error){
 	"id":     NewIdentity,
 	"array":  NewArray,
 	"object": NewObject,
+	"pipe":   NewPipe,
 }
 
 type Constant struct {
@@ -282,4 +283,27 @@ func (t Object) Get(arg interface{}) (interface{}, error) {
 	}
 
 	return outObject, nil
+}
+
+type Pipe struct {
+	Expressions []Expression
+}
+
+func NewPipe(ts ...Expression) (Expression, error) {
+	if len(ts) == 0 {
+		return nil, fmt.Errorf("pipe function needs at least one argument")
+	}
+	return Pipe{Expressions: ts}, nil
+}
+
+func (t Pipe) Get(arg interface{}) (interface{}, error) {
+	object := arg
+	for i := range t.Expressions {
+		var err error
+		object, err = t.Expressions[i].Get(object)
+		if err != nil {
+			return nil, fmt.Errorf("error in pipe subexpression with index %d: %w", i, err)
+		}
+	}
+	return object, nil
 }
