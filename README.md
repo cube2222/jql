@@ -453,7 +453,7 @@ equal to
 ```
 
 ### recover
-Finally, them whose name shall not be spoken out loud. 👹 Needing them means you either encountered a bug in **jql**, or that your dataset is seriously botched.
+Finally, the one whose name shall not be spoken out loud. 👹 Needing them means you either encountered a bug in **jql**, or that your dataset is seriously botched.
 
 They'll help you catch errors and panics, nullyfing the expression, leaving only void behind.
 ```
