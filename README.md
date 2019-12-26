@@ -108,7 +108,7 @@ elem can work with single strings, single integers, arrays of those, and objects
 
 #### keys
 
-What if we want to get all the country names? A new friend - _keys_ - can help us here.
+What if we want to get all the country names? A new friend - _keys_ - is key in this situation. 🗝
 ```
 cat test.json | jql '(elem "countries" (elem (keys) (elem "name")))'
 [
@@ -256,7 +256,7 @@ Now we're done with the **core** functionality of jql. The stuff so far will pro
 
 However, here come more functions:
 
-### String manipulation
+### String manipulation 🎻
 
 #### join
 If you ever need to _join_ an array of expressions into a string, _join_'s the mate you're looking for! _join_ will also stringify anything it meets.
@@ -294,7 +294,7 @@ Anyways, here you go, the syntax is the same as that of the go standard library 
   "Germany population: 83000000"
 ]
 ```
-Hope you're feeling comfortable now :)
+Hope you're feeling comfortable 🛋 now :)
 
 ### error
 There's a little helper function - _error_ - for those times when you're debugging your queries.
@@ -474,13 +474,15 @@ He'll help you catch errors and panics, nullyfing the expression, leaving only v
   }
 ]
 ```
-In practice you obviously have to spell out her name, otherwise it won't work, but that's on you!
+Combine her with _filter_ and even the void will be gone!
+
+In practice you obviously have to spell out his name, otherwise it won't work, but that's on you!
 
 # Summary
 Hope you enjoyed this **incredible** journey!
 
 Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I hope **jql** will become your weapon of choice for dealing with them from now on! ⚔️
 
-Issues, comments, messages, reviews, benchmarks, you name it! - very appreciated.
+Issues, comments, messages, reviews, benchmarks, you name it! - all are very appreciated! 😉
 
 TODO: Benchmarks
