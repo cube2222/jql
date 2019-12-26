@@ -1,7 +1,7 @@
 # jql
 Hey there!
 
-You're probably here cause you're fed up with other json query processors being too complicated to use for anything surpassing simple single field selection. 🤮
+You're probably here cause you're fed up with other json query processors being too complicated to use for anything surpassing simple single field selection.
 
 Well, at least that's what led me here. And that's why I've written **jql**, a json query processor with an even more cryptic - lispy - syntax (Maybe not that cryptic after all? I quite like it :) )
 
