@@ -484,4 +484,21 @@ Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I 
 
 Issues, comments, messages, reviews, benchmarks, you name it! - all are very appreciated! 😉
 
-TODO: Benchmarks
+# Benchmarks
+
+This is a fairly synthetic benchmark (it's the first that came to my mind), so I won't say jql is faster than jq. Especially since jq has various much more advanced functionalities.
+
+What I will say though, is that jql is definitely not slow and you can freely cut your way through gigabytes of data quickly.
+
+The benchbig.json file contains 2^20 repetitions of the json we've been using in the examples so far, and the benchmedium.json file contains 20.
+
+| Command | Mean [s] | Min [s] | Max [s] | Relative |
+|:---|---:|---:|---:|---:|
+| `cat benchbig.json \| jql '("countries" ((keys) ("name")))' >> out.json` | 5.923 ± 0.034 | 5.890 | 6.003 | 797.90 ± 52.78 |
+| `cat benchbig.json \| jq '.countries[].name' >> out.json` | 14.960 ± 0.047 | 14.906 | 15.047 | 2015.24 ± 132.94 |
+| `cat benchmedium.json \| jql '("countries" ((keys) ("name")))' >> out.json` | 0.007 ± 0.000 | 0.007 | 0.010 | 1.00 |
+| `cat benchmedium.json \| jq '.countries[].name' >> out.json` | 0.024 ± 0.001 | 0.022 | 0.032 | 3.23 ± 0.26 |
+
+The benchmarks were run using hyperfine on a preheated (very loud) Macbook Pro 13 mid-2019 i7 2.8GHz 16GB 256GB
+
+You can generate the benchmark data with benchmarks/gen.sh.

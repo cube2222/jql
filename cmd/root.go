@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -41,8 +42,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		input := json.NewDecoder(os.Stdin)
-		output := json.NewEncoder(os.Stdout)
+		input := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 4096*16))
+		output := json.NewEncoder(bufio.NewWriterSize(os.Stdout, 4096*16))
 		output.SetIndent("", "  ")
 
 		app := app.NewApp(args[0], input, output)
