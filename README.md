@@ -452,8 +452,32 @@ equal to
 ]
 ```
 
+### recover
+Finally, he whose name shall not be spoken out loud. 👹 Needing her means you either encountered a bug in **jql**, or that your dataset is seriously botched.
+
+He'll help you catch errors and panics, nullyfing the expression, leaving only void behind.
+```
+> cat test.json | jql '("countries" ((keys) (rec*** (ifte ("european") (id) (error "not european")))))'
+[
+  {
+    "eu_since": "2004",
+    "european": true,
+    "name": "Poland",
+    "population": 38000000
+  },
+  null,
+  {
+    "eu_since": "1993",
+    "european": true,
+    "name": "Germany",
+    "population": 83000000
+  }
+]
+```
+You obviously have to spell out her name in practice or it won't work, but that's on you!
+
 # Summary
-Hope you liked this **incredible** journey!
+Hope you enjoyed this **incredible** journey!
 
 Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I hope **jql** will become your weapon of choice for dealing with them from now on! ⚔️
 

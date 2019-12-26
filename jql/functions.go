@@ -26,6 +26,7 @@ var Functions = map[string]func(ts ...Expression) (Expression, error){
 	"not":     NewNot,
 	"ifte":    NewIfTE,
 	"error":   NewError,
+	"recover": NewRecover,
 }
 
 type Constant struct {
@@ -716,4 +717,32 @@ func (t Error) Get(arg interface{}) (interface{}, error) {
 	}
 
 	return nil, fmt.Errorf("Message: %v\n%s", message, debug.Stack())
+}
+
+type Recover struct {
+	Expression Expression
+}
+
+func NewRecover(ts ...Expression) (Expression, error) {
+	if len(ts) != 1 {
+		return nil, fmt.Errorf("invalid argument count to recover function: %v", len(ts))
+	}
+	return Recover{
+		Expression: ts[0],
+	}, nil
+}
+
+func (t Recover) Get(arg interface{}) (out interface{}, err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			out = nil
+			err = nil
+		}
+	}()
+	value, err := t.Expression.Get(arg)
+	if err != nil {
+		return nil, nil
+	}
+
+	return value, nil
 }
