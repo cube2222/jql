@@ -81,7 +81,7 @@ What if we wanted only the first country from that list?
   "population": 38000000
 }
 ```
-Let's break down what happened here. First we took the "countries" field. elem takes an additional argument, which says "how to transform the element", it's also an expression. Here we say we want to take the first element of the countries array. The default function is _id_, which stands for identity.
+Let's break down what happened here. First we took the "countries" field. elem takes an additional argument, it says "how to transform the element" and is also an expression. Here we say we want to take the first element of the countries array. The default function is _id_, which stands for identity.
 
 #### array
 
@@ -283,8 +283,6 @@ With separator:
 #### sprintf
 Whenever I learn a new language, I feel much more comfortable when I know there's a sprintf function. (and how to use it)
 
-Don't really know why though.
-
 Anyways, here you go, the syntax is the same as that of the go standard library [fmt.Sprintf](https://golang.org/pkg/fmt/) function:
 ```
 > cat test.json | jql '("countries" ((keys) (sprintf "%s population: %.0f" ("name") ("population"))))'
@@ -366,6 +364,7 @@ true
 > cat test.json | jql '(not (array false))'
 false
 ```
+_and_ and _or_ are both lazy.
 
 #### Truthiness
 
@@ -443,7 +442,7 @@ _pipe_ is a fairly useless function because you can just use a bash pipe. But if
   "United States"
 ]
 ```
-equal to
+is equal to
 ```
 > cat test.json | jql '("countries")' | jql '((range 2))' | jql '((keys) ("name"))'
 [
