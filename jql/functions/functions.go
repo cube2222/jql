@@ -1,13 +1,15 @@
-package jql
+package functions
 
 import (
 	"fmt"
 	"reflect"
 	"runtime/debug"
 	"strings"
+
+	"github.com/cube2222/jql/jql"
 )
 
-var Functions = map[string]func(ts ...Expression) (Expression, error){
+var Functions = map[string]func(ts ...jql.Expression) (jql.Expression, error){
 	"elem":    NewElement,
 	"keys":    NewKeys,
 	"id":      NewIdentity,
@@ -29,24 +31,12 @@ var Functions = map[string]func(ts ...Expression) (Expression, error){
 	"recover": NewRecover,
 }
 
-type Constant struct {
-	value interface{}
-}
-
-func NewConstant(value interface{}) Expression {
-	return &Constant{value: value}
-}
-
-func (s Constant) Get(input interface{}) (interface{}, error) {
-	return s.value, nil
-}
-
 type Element struct {
-	Positions       Expression
-	ValueExpression Expression
+	Positions       jql.Expression
+	ValueExpression jql.Expression
 }
 
-func NewElement(ts ...Expression) (Expression, error) {
+func NewElement(ts ...jql.Expression) (jql.Expression, error) {
 	switch len(ts) {
 	case 1:
 		return Element{
@@ -63,7 +53,7 @@ func NewElement(ts ...Expression) (Expression, error) {
 	}
 }
 
-func GetElement(positions interface{}, argument interface{}, leafExpression Expression) (interface{}, error) {
+func GetElement(positions interface{}, argument interface{}, leafExpression jql.Expression) (interface{}, error) {
 	switch positionTyped := positions.(type) {
 	case []interface{}:
 		outArray := make([]interface{}, len(positionTyped))
@@ -139,7 +129,7 @@ func (t Element) Get(arg interface{}) (interface{}, error) {
 type Keys struct {
 }
 
-func NewKeys(ts ...Expression) (Expression, error) {
+func NewKeys(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 0 {
 		return nil, fmt.Errorf("expected no arguments to keys function, got %d arguments", len(ts))
 	}
@@ -173,7 +163,7 @@ func (s Keys) Get(arg interface{}) (interface{}, error) {
 type Identity struct {
 }
 
-func NewIdentity(ts ...Expression) (Expression, error) {
+func NewIdentity(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 0 {
 		return nil, fmt.Errorf("expected no arguments to id function, got %d arguments", len(ts))
 	}
@@ -186,10 +176,10 @@ func (t Identity) Get(arg interface{}) (interface{}, error) {
 }
 
 type Array struct {
-	Values []Expression
+	Values []jql.Expression
 }
 
-func NewArray(ts ...Expression) (Expression, error) {
+func NewArray(ts ...jql.Expression) (jql.Expression, error) {
 	return Array{Values: ts}, nil
 }
 
@@ -207,16 +197,16 @@ func (t Array) Get(arg interface{}) (interface{}, error) {
 }
 
 type Object struct {
-	Keys   []Expression
-	Values []Expression
+	Keys   []jql.Expression
+	Values []jql.Expression
 }
 
-func NewObject(ts ...Expression) (Expression, error) {
+func NewObject(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts)%2 != 0 {
 		return nil, fmt.Errorf("object function should contain an even argument count (you need a value for each key), got argument count: %v", len(ts))
 	}
-	keys := make([]Expression, len(ts)/2)
-	values := make([]Expression, len(ts)/2)
+	keys := make([]jql.Expression, len(ts)/2)
+	values := make([]jql.Expression, len(ts)/2)
 	for i := range ts {
 		if i%2 == 0 {
 			keys[i/2] = ts[i]
@@ -250,10 +240,10 @@ func (t Object) Get(arg interface{}) (interface{}, error) {
 }
 
 type Pipe struct {
-	Expressions []Expression
+	Expressions []jql.Expression
 }
 
-func NewPipe(ts ...Expression) (Expression, error) {
+func NewPipe(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) == 0 {
 		return nil, fmt.Errorf("pipe function needs at least one argument")
 	}
@@ -273,11 +263,11 @@ func (t Pipe) Get(arg interface{}) (interface{}, error) {
 }
 
 type Sprintf struct {
-	Format      Expression
-	Expressions []Expression
+	Format      jql.Expression
+	Expressions []jql.Expression
 }
 
-func NewSprintf(ts ...Expression) (Expression, error) {
+func NewSprintf(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) == 0 {
 		return nil, fmt.Errorf("sprintf function needs at least one argument")
 	}
@@ -306,16 +296,16 @@ func (t Sprintf) Get(arg interface{}) (interface{}, error) {
 }
 
 type Join struct {
-	Strings   Expression
-	Separator Expression
+	Strings   jql.Expression
+	Separator jql.Expression
 }
 
-func NewJoin(ts ...Expression) (Expression, error) {
+func NewJoin(ts ...jql.Expression) (jql.Expression, error) {
 	switch len(ts) {
 	case 1:
 		return Join{
 			Strings:   ts[0],
-			Separator: &Constant{value: ""},
+			Separator: &jql.Constant{Value: ""},
 		}, nil
 	case 2:
 		return Join{
@@ -365,11 +355,11 @@ func IsTruthy(value interface{}) bool {
 }
 
 type Filter struct {
-	Predicate  Expression
-	Expression Expression
+	Predicate  jql.Expression
+	Expression jql.Expression
 }
 
-func NewFilter(ts ...Expression) (Expression, error) {
+func NewFilter(ts ...jql.Expression) (jql.Expression, error) {
 	switch len(ts) {
 	case 1:
 		return Filter{
@@ -409,11 +399,11 @@ func (t Filter) Get(arg interface{}) (interface{}, error) {
 }
 
 type Equal struct {
-	Left  Expression
-	Right Expression
+	Left  jql.Expression
+	Right jql.Expression
 }
 
-func NewEqual(ts ...Expression) (Expression, error) {
+func NewEqual(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 2 {
 		return nil, fmt.Errorf("invalid argument count to equal function: %v", len(ts))
 	}
@@ -449,11 +439,11 @@ func Floatify(arg interface{}) (float64, error) {
 }
 
 type LessThan struct {
-	Left  Expression
-	Right Expression
+	Left  jql.Expression
+	Right jql.Expression
 }
 
-func NewLessThan(ts ...Expression) (Expression, error) {
+func NewLessThan(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 2 {
 		return nil, fmt.Errorf("invalid argument count to lt function: %v", len(ts))
 	}
@@ -499,11 +489,11 @@ func (t LessThan) Get(arg interface{}) (interface{}, error) {
 }
 
 type GreaterThan struct {
-	Left  Expression
-	Right Expression
+	Left  jql.Expression
+	Right jql.Expression
 }
 
-func NewGreaterThan(ts ...Expression) (Expression, error) {
+func NewGreaterThan(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 2 {
 		return nil, fmt.Errorf("invalid argument count to gt function: %v", len(ts))
 	}
@@ -549,15 +539,15 @@ func (t GreaterThan) Get(arg interface{}) (interface{}, error) {
 }
 
 type Range struct {
-	Begin Expression
-	End   Expression
+	Begin jql.Expression
+	End   jql.Expression
 }
 
-func NewRange(ts ...Expression) (Expression, error) {
+func NewRange(ts ...jql.Expression) (jql.Expression, error) {
 	switch len(ts) {
 	case 1:
 		return &Range{
-			Begin: &Constant{value: 0},
+			Begin: &jql.Constant{Value: 0},
 			End:   ts[0],
 		}, nil
 	case 2:
@@ -598,10 +588,10 @@ func (t Range) Get(arg interface{}) (interface{}, error) {
 }
 
 type And struct {
-	Values []Expression
+	Values []jql.Expression
 }
 
-func NewAnd(ts ...Expression) (Expression, error) {
+func NewAnd(ts ...jql.Expression) (jql.Expression, error) {
 	return And{Values: ts}, nil
 }
 
@@ -619,10 +609,10 @@ func (t And) Get(arg interface{}) (interface{}, error) {
 }
 
 type Or struct {
-	Values []Expression
+	Values []jql.Expression
 }
 
-func NewOr(ts ...Expression) (Expression, error) {
+func NewOr(ts ...jql.Expression) (jql.Expression, error) {
 	return Or{Values: ts}, nil
 }
 
@@ -640,10 +630,10 @@ func (t Or) Get(arg interface{}) (interface{}, error) {
 }
 
 type Not struct {
-	Value Expression
+	Value jql.Expression
 }
 
-func NewNot(ts ...Expression) (Expression, error) {
+func NewNot(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 1 {
 		return nil, fmt.Errorf("invalid argument count to not function: %v", len(ts))
 	}
@@ -660,12 +650,12 @@ func (t Not) Get(arg interface{}) (interface{}, error) {
 }
 
 type IfTE struct {
-	If   Expression
-	Then Expression
-	Else Expression
+	If   jql.Expression
+	Then jql.Expression
+	Else jql.Expression
 }
 
-func NewIfTE(ts ...Expression) (Expression, error) {
+func NewIfTE(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 3 {
 		return nil, fmt.Errorf("invalid argument count to ifte function: %v", len(ts))
 	}
@@ -698,10 +688,10 @@ func (t IfTE) Get(arg interface{}) (interface{}, error) {
 }
 
 type Error struct {
-	Message Expression
+	Message jql.Expression
 }
 
-func NewError(ts ...Expression) (Expression, error) {
+func NewError(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 1 {
 		return nil, fmt.Errorf("invalid argument count to error function: %v", len(ts))
 	}
@@ -720,10 +710,10 @@ func (t Error) Get(arg interface{}) (interface{}, error) {
 }
 
 type Recover struct {
-	Expression Expression
+	Expression jql.Expression
 }
 
-func NewRecover(ts ...Expression) (Expression, error) {
+func NewRecover(ts ...jql.Expression) (jql.Expression, error) {
 	if len(ts) != 1 {
 		return nil, fmt.Errorf("invalid argument count to recover function: %v", len(ts))
 	}

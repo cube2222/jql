@@ -1,49 +1,22 @@
+/*
+Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"encoding/json"
-	"io"
-	"log"
-	"os"
-
-	"github.com/cube2222/jql/jql"
-	"github.com/cube2222/jql/jql/parser"
-)
+import "github.com/cube2222/jql/cmd"
 
 func main() {
-	parsed := parser.Parse(os.Args[1])
-	expr, err := parsed.GetExecutionExpression(parser.ExpressionConstructorContext{
-		Functions: jql.Functions,
-		ConstantExpression: func(value interface{}) jql.Expression {
-			return jql.NewConstant(value)
-		},
-	})
-	if err != nil {
-		log.Fatalf("couldn't get execution expression from AST: %v", err)
-	}
-
-	input := json.NewDecoder(os.Stdin)
-	output := json.NewEncoder(os.Stdout)
-	output.SetIndent("", "  ")
-
-	for {
-		var inObject interface{}
-		err := input.Decode(&inObject)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Fatalf("couldn't decode json: %v", err)
-		}
-
-		outObject, err := expr.Get(inObject)
-		if err != nil {
-			log.Fatalf("error getting expression value for object: %v", err)
-		}
-
-		err = output.Encode(&outObject)
-		if err != nil {
-			log.Fatalf("couldn't encode json: %v", err)
-		}
-	}
+	cmd.Execute()
 }
