@@ -474,7 +474,7 @@ He'll help you catch errors and panics, nullyfing the expression, leaving only v
   }
 ]
 ```
-You obviously have to spell out her name in practice or it won't work, but that's on you!
+In practice you obviously have to spell out her name, otherwise it won't work, but that's on you!
 
 # Summary
 Hope you enjoyed this **incredible** journey!
