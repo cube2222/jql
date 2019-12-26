@@ -501,6 +501,6 @@ The benchbig.json file contains 2^20 repetitions of the json we've been using in
 | `cat benchmedium.json \| jql '("countries" ((keys) ("name")))' >> out.json` | 0.007 ± 0.000 | 0.007 | 0.010 | 1.00 |
 | `cat benchmedium.json \| jq '.countries[].name' >> out.json` | 0.024 ± 0.001 | 0.022 | 0.032 | 3.23 ± 0.26 |
 
-The benchmarks were run using hyperfine on a preheated (very loud) Macbook Pro 13 mid-2019 i7 2.8GHz 16GB 256GB.
+The benchmarks were run using [hyperfine](https://github.com/sharkdp/hyperfine) on a preheated (very loud) Macbook Pro 13 mid-2019 i7 2.8GHz 16GB 256GB.
 
 You can generate the benchmark data with benchmarks/gen.sh.
