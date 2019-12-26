@@ -7,6 +7,8 @@ Well, at least that's what led me here. And that's why I've written **jql**, a j
 
 **jql** aims to be friendly, helpful, pat you on the back when you're faced with a monstrosity of a JSON blob. Help you mold it into something useful, step by step.
 
+If you want to see **benchmarks** they're at [the end of the README][#Benchmarks]
+
 Ok, let's check it out now, but first things first, you have to install it:
 ```
 go get github.com/cube2222/jql
