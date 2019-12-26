@@ -453,7 +453,7 @@ equal to
 ```
 
 ### recover
-Finally, he whose name shall not be spoken out loud. 👹 Needing her means you either encountered a bug in **jql**, or that your dataset is seriously botched.
+Finally, he whose name shall not be spoken out loud. 👹 Needing him means you either encountered a bug in **jql**, or that your dataset is seriously botched.
 
 He'll help you catch errors and panics, nullyfing the expression, leaving only void behind.
 ```
@@ -474,7 +474,7 @@ He'll help you catch errors and panics, nullyfing the expression, leaving only v
   }
 ]
 ```
-Combine her with _filter_ and even the void will be gone!
+Combine him with _filter_ and even the void will be gone!
 
 In practice you obviously have to spell out his name, otherwise it won't work, but that's on you!
 
