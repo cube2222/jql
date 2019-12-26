@@ -486,9 +486,9 @@ Issues, comments, messages, reviews, benchmarks, you name it! - all are very app
 
 # Benchmarks
 
-This is a fairly synthetic benchmark (it's the first that came to my mind), so I won't say jql is faster than jq. Especially since jq has various much more advanced functionalities.
+This is a fairly synthetic benchmark (it's the first that came to my mind), so I won't say **jql** is faster than jq. Especially since jq has various much more advanced functionalities.
 
-What I will say though, is that jql is definitely not slow and you can freely cut your way through gigabytes of data quickly, as in the following benchmarks it was 2-3 times faster than jq.
+What I will say though, is that **jql** is definitely not slow and you can freely cut your way through gigabytes of data quickly, as in the following benchmarks it was 2-3 times faster than jq.
 
 The benchbig.json file contains 2^20 repetitions of the json we've been using in the examples so far, and the benchmedium.json file contains 20.
 
