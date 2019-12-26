@@ -453,9 +453,9 @@ equal to
 ```
 
 ### recover
-Finally, the one whose name shall not be spoken out loud. 👹 Needing them means you either encountered a bug in **jql**, or that your dataset is seriously botched.
+Finally, the one whose name shall not be spoken out loud. 👹 Needing him means you either encountered a bug in **jql**, or that your dataset is seriously botched.
 
-They'll help you catch errors and panics, nullyfing the expression, leaving only void behind.
+He'll help you catch errors and panics, nullyfing the expression, leaving only void behind.
 ```
 > cat test.json | jql '("countries" ((keys) (rec*** (ifte ("european") (id) (error "not european")))))'
 [
@@ -476,7 +476,7 @@ They'll help you catch errors and panics, nullyfing the expression, leaving only
 ```
 Combine them with _filter_ and even the void will be gone!
 
-In practice you obviously have to spell out their name, otherwise it won't work, but that's on you!
+In practice you obviously have to spell out his name, otherwise it won't work, but that's on you!
 
 # Summary
 Hope you enjoyed this **incredible** journey!
