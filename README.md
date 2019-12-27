@@ -354,7 +354,7 @@ false
 > cat test.json | jql '(or true true false)'
 true
 > cat test.json | jql '(or)'
-true
+false
 > cat test.json | jql '(and)'
 true
 > cat test.json | jql '(not true)'
@@ -475,7 +475,7 @@ He'll help you catch errors and panics, nullyfing the expression, leaving only v
   }
 ]
 ```
-Combine them with _filter_ and even the void will be gone!
+Combine him with _filter_ and even the void will be gone!
 
 In practice you obviously have to spell out his name, otherwise it won't work, but that's on you!
 

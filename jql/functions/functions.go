@@ -596,16 +596,17 @@ func NewAnd(ts ...jql.Expression) (jql.Expression, error) {
 }
 
 func (t And) Get(arg interface{}) (interface{}, error) {
-	out := true
 	for i := range t.Values {
 		v, err := t.Values[i].Get(arg)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't evaluate and argument with index %d: %w", i, err)
 		}
-		out = out && IsTruthy(v)
+		if !IsTruthy(v) {
+			return false, nil
+		}
 	}
 
-	return out, nil
+	return true, nil
 }
 
 type Or struct {
@@ -617,16 +618,17 @@ func NewOr(ts ...jql.Expression) (jql.Expression, error) {
 }
 
 func (t Or) Get(arg interface{}) (interface{}, error) {
-	out := true
 	for i := range t.Values {
 		v, err := t.Values[i].Get(arg)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't evaluate or argument with index %d: %w", i, err)
 		}
-		out = out || IsTruthy(v)
+		if IsTruthy(v) {
+			return true, nil
+		}
 	}
 
-	return out, nil
+	return false, nil
 }
 
 type Not struct {
