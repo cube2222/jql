@@ -9,6 +9,8 @@ Well, at least that's what led me here. And that's why I've written **jql**, a j
 
 If you want to see **benchmarks**, they're at [the end of the README.](#Benchmarks)
 
+If you want to see a cheatsheet with function types, it's [right before the benchmarks](#Type Cheatsheet).
+
 Ok, let's check it out now, but first things first, you have to install it:
 ```
 go get github.com/cube2222/jql
@@ -487,6 +489,32 @@ Hope you enjoyed this **incredible** journey!
 Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I hope **jql** will become your weapon of choice for dealing with them from now on! ⚔️
 
 Issues, comments, messages, reviews, benchmarks, you name it! - all are very appreciated! 😉
+
+# Type Cheatsheet
+```
+JSON: Any value
+Expression[T]: (JSON -> T)
+elem:
+    With one arg: (Expression[Position]) -> (Expression[JSON]) = (elem position (id))
+    With two args: (Expression[Position] x Expression[T]) -> (Expression[T])
+keys: () -> (Expression[JSON])
+id: () -> (Expression[JSON])
+array: (Expression[T]...) -> (Expression[Array[T]]) (T's can vary)
+object: ((Expression x Expression[T])...) -> (Expression[T])
+pipe: (Expression...) -> (Expression)
+sprintf: (Expression[String] x Expression[T]...) -> (Expression[String])
+join: (Expression[T]...) -> (Expression[String])
+filter: (Expression[Bool]) -> (Expression[JSON])
+eq,lt,gt: (Expression x Expression) -> (Expression[Bool])
+range: 
+    With one arg: (Expression[Int]) -> (Expression[Array[Int]])
+    With two args: (Expression[Int] x Expression[Int]) -> (Expression[Array[Int]])
+and,or: (Expression[Bool]...) -> (Expression[Bool])
+not: (Expression[Bool]) -> (Expression[Bool])
+ifte: (Expression[Bool] x Expression[A] x Expression[B]) -> (Expression[A|B])
+error: (Expression[JSON]) -> (!)
+recover: (Expression[JSON]) -> (Expression[JSON])
+```
 
 # Benchmarks
 
