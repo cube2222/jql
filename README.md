@@ -494,6 +494,7 @@ Issues, comments, messages, reviews, benchmarks, you name it! - all are very app
 ```
 JSON: Any value
 Expression[T]: (JSON -> T)
+Expression can be seen as a Continuation
 elem:
     With one arg: (Expression[Position]) -> (Expression[JSON]) = (elem position (id))
     With two args: (Expression[Position] x Expression[T]) -> (Expression[T])
