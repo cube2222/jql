@@ -25,7 +25,9 @@ var rootCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		input := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 4096*16))
-		output := json.NewEncoder(bufio.NewWriterSize(os.Stdout, 4096*16))
+		w := bufio.NewWriterSize(os.Stdout, 4096*16)
+		defer w.Flush()
+		output := json.NewEncoder(w)
 		output.SetIndent("", "  ")
 
 		app := app.NewApp(args[0], input, output)
