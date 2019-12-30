@@ -486,7 +486,7 @@ Hope you enjoyed this **incredible** journey!
 
 Moreover, I hope it's not the end of it! Hordes of JSON blobs still await and I hope **jql** will become your weapon of choice for dealing with them from now on! ⚔️
 
-Issues, comments, messages, reviews, benchmarks, you name it! - all are very appreciated! 😉
+Issues, ⭐️stars⭐️, comments, messages, reviews, benchmarks, you name it! - all are very appreciated! 😉
 
 # Benchmarks
 
