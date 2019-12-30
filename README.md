@@ -9,7 +9,7 @@ Well, at least that's what led me here. And that's why I've written **jql**, a j
 
 If you want to see **benchmarks**, they're at [the end of the README.](#Benchmarks)
 
-If you want to see a cheatsheet with function types, it's [right before the benchmarks](#Type Cheatsheet).
+If you want to see a cheatsheet with function types, it's [right before the benchmarks](#Type-Cheatsheet).
 
 Ok, let's check it out now, but first things first, you have to install it:
 ```
