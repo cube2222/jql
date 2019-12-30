@@ -16,7 +16,7 @@ go get github.com/cube2222/jql
 
 Ok. Done.
 
-If you don't have the Go toolchain installed, just download one of the releases.
+If you don't have the Go toolchain installed, just download one of the release binaries.
 
 Let's check out a few _simple_ examples. (remember? That's explicitly **not** why we're here. But it aids understanding of the more complex examples, so stay with me just a little bit longer!)
 
