@@ -20,6 +20,11 @@ Ok. Done.
 
 If you don't have the Go toolchain installed, just download one of the release binaries.
 
+If you want an interactive window to get live output for queries, use:
+```
+echo '' | fzf --print-query --preview-window wrap --preview 'cat test.json | jql {q}'
+```
+
 Let's check out a few _simple_ examples. (remember? That's explicitly **not** why we're here. But it aids understanding of the more complex examples, so stay with me just a little bit longer!)
 
 We'll be working with this piece of json:
