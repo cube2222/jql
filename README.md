@@ -133,7 +133,7 @@ It returns an array of all the keys of the given collection. Fields and Indices 
 
 To illustrate, here's _keys_ used on an object:
 ```
-> cat test.json | jql '("countries" (0 (keys)))'
+> cat test.json | jql '(elem "countries" (elem 0 (keys)))'
 [
   "name",
   "population",
