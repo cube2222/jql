@@ -10,7 +10,6 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tj/go-termd"
 
 	"github.com/cube2222/jql/jql/app"
 )
@@ -21,7 +20,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "jql <query>",
 	Short: "JSON Query Processor with a Lispy syntax.",
-	Long:  (&termd.Compiler{}).Compile(string(MustAsset("../README.md"))),
+	Long:  string(MustAsset("../README.md")),
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		input := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 4096*16))
