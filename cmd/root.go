@@ -8,13 +8,22 @@ import (
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/nwidger/jsoncolor"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/cube2222/jql/jql/app"
 )
 
-var cfgFile string
+var (
+	cfgFile    string
+	monochrome bool
+)
+
+type encoder interface {
+	Encode(v interface{}) error
+	SetIndent(prefix, indent string)
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -26,7 +35,12 @@ var rootCmd = &cobra.Command{
 		input := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 4096*16))
 		w := bufio.NewWriterSize(os.Stdout, 4096*16)
 		defer w.Flush()
-		output := json.NewEncoder(w)
+		var output encoder
+		if monochrome {
+			output = json.NewEncoder(w)
+		} else {
+			output = jsoncolor.NewEncoder(w)
+		}
 		output.SetIndent("", "  ")
 
 		app := app.NewApp(args[0], input, output)
@@ -54,6 +68,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.jql.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&monochrome, "monochrome", false, "monochrome (don't colorize output)")
 }
 
 // initConfig reads in config file and ENV variables if set.
