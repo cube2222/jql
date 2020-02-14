@@ -541,7 +541,7 @@ The benchmarks were run using [hyperfine](https://github.com/sharkdp/hyperfine) 
 
 You can generate the benchmark data with benchmarks/gen.sh.
 
-# Thank You notes
+# Special Thanks
 A big thank you to the following people for reviewing the current or previous versions of this document:
 - Jan Chomiak ( @JasiekChomiak )
 - Hugo Dutka ( @hugodutka )
