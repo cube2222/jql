@@ -540,3 +540,11 @@ The benchbig.json file contains 2^20 repetitions of the json we've been using in
 The benchmarks were run using [hyperfine](https://github.com/sharkdp/hyperfine) on a preheated (very loud) Macbook Pro 13 mid-2019 i7 2.8GHz 16GB 256GB.
 
 You can generate the benchmark data with benchmarks/gen.sh.
+
+# Thank You notes
+A big thank you to the following people for reviewing the current or previous versions of this document:
+- Jan Chomiak ( @JasiekChomiak )
+- Hugo Dutka ( @hugodutka )
+- Katarzyna Gajos
+- Andrzej Głuszak ( @agluszak )
+- Wojciech Kuźmiński ( @woojtek )
