@@ -4,8 +4,16 @@ before:
     # you may remove this if you don't use vgo
     - go mod tidy
 builds:
-- env:
-  - CGO_ENABLED=0
+- binary: jql
+  id: jql
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - amd64
+  env:
+    - CGO_ENABLED=0
 archives:
 - replacements:
     darwin: Darwin
