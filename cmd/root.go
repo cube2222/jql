@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 	Use:   "jql <query>",
 	Short: "JSON Query Processor with a Lispy syntax.",
 	Long:  string(MustAsset("../README.md")),
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		input := json.NewDecoder(bufio.NewReaderSize(os.Stdin, 4096*16))
 		w := bufio.NewWriterSize(os.Stdout, 4096*16)
@@ -43,6 +43,9 @@ var rootCmd = &cobra.Command{
 		}
 		output.SetIndent("", "  ")
 
+		if len(args) == 0 {
+			args = append(args, "(id)")
+		}
 		app := app.NewApp(args[0], input, output)
 
 		if err := app.Run(); err != nil {
