@@ -1,7 +1,6 @@
 # Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
-    # you may remove this if you don't use vgo
     - go mod tidy
 builds:
 - binary: jql
@@ -12,14 +11,9 @@ builds:
     - windows
   goarch:
     - amd64
+    - arm64
   env:
     - CGO_ENABLED=0
-archives:
-- replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    amd64: x86_64
 checksum:
   name_template: 'checksums.txt'
 snapshot:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime/debug"
+	"sort"
 	"strings"
 
 	"github.com/cube2222/jql/jql"
@@ -29,6 +30,7 @@ var Functions = map[string]func(ts ...jql.Expression) (jql.Expression, error){
 	"ifte":    NewIfTE,
 	"error":   NewError,
 	"recover": NewRecover,
+	"zip":     NewZip,
 }
 
 type Element struct {
@@ -152,6 +154,9 @@ func (s Keys) Get(arg interface{}) (interface{}, error) {
 		for field := range typed {
 			outFields = append(outFields, field)
 		}
+		sort.Slice(outFields, func(i, j int) bool {
+			return outFields[i].(string) < outFields[j].(string)
+		})
 
 		return outFields, nil
 
@@ -737,4 +742,41 @@ func (t Recover) Get(arg interface{}) (out interface{}, err error) {
 	}
 
 	return value, nil
+}
+
+type Zip struct {
+	Arguments []jql.Expression
+}
+
+func NewZip(ts ...jql.Expression) (jql.Expression, error) {
+	return Zip{Arguments: ts}, nil
+}
+
+func (t Zip) Get(arg interface{}) (interface{}, error) {
+	args := make([][]interface{}, len(t.Arguments))
+	for i, curArg := range t.Arguments {
+		curArgValue, err := curArg.Get(arg)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't evaluate argument with index %d: %w", i, err)
+		}
+
+		curArgValueTyped, ok := curArgValue.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("zip expects arrays as arguments, received %v of type %s", curArgValue, reflect.TypeOf(curArgValue))
+		}
+		args[i] = curArgValueTyped
+	}
+
+	var out []interface{}
+
+	for i := 0; ; i++ {
+		curOut := make([]interface{}, len(args))
+		for j := range args {
+			if i >= len(args[j]) {
+				return out, nil
+			}
+			curOut[j] = args[j][i]
+		}
+		out = append(out, curOut)
+	}
 }

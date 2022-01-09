@@ -263,6 +263,34 @@ You can also use _object_ to create objects, with arguments alternating keys and
 }
 ```
 
+#### zip
+
+Occasionally you might want to combine multiple arrays, you can use _zip_ to do that. For example, to create a list of key-value entries from an object, you can do the following:
+```
+> cat test.json | jql '("countries" 
+                           (0 (zip 
+                                 (keys) 
+                                 ((keys)))))'
+[
+  [
+     "eu_since",
+     "2004"
+  ],
+  [
+     "european",
+     true
+  ],
+  [
+     "name",
+     "Poland"
+  ],
+  [
+     "population",
+     38000000
+  ]
+]
+```
+
 Now we're done with the **core** functionality of jql. The stuff so far will probably suffice for most use cases and even very complex data structures.
 
 However, here come more functions:
@@ -515,6 +543,7 @@ eq,lt,gt: (Expression x Expression) -> (Expression[Bool])
 range: 
     With one arg: (Expression[Int]) -> (Expression[Array[Int]])
     With two args: (Expression[Int] x Expression[Int]) -> (Expression[Array[Int]])
+zip: (Expression[Array[A]], Expression[Array[B]], ...) -> (Expression[Array[Array[A | B | ...]]])
 and,or: (Expression[Bool]...) -> (Expression[Bool])
 not: (Expression[Bool]) -> (Expression[Bool])
 ifte: (Expression[Bool] x Expression[A] x Expression[B]) -> (Expression[A|B])
