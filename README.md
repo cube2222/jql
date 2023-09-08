@@ -13,7 +13,7 @@ If you want to see a cheatsheet with function types, it's [right before the benc
 
 Ok, let's check it out now, but first things first, you have to install it:
 ```
-go get github.com/cube2222/jql
+go install github.com/cube2222/jql
 ```
 
 Ok. Done.
